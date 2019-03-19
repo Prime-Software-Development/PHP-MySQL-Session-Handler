@@ -69,6 +69,7 @@ final class SessionHandler implements \SessionHandlerInterface
         {
             $row = $result->fetch_assoc();
             $result = $row['data'];
+            $result = $result === null ? "" : $result;
         }
         
         return $result;
