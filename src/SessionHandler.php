@@ -8,8 +8,8 @@ final class SessionHandler implements \SessionHandlerInterface
     private $dbConnection; # the mysqli connection
     private $dbTable; # name of the db table to store sessions in
     private $m_maxAge;
-    
-    
+
+
     /**
      * Create the session handler.
      * @param \mysqli $mysqli - the database connection to store sessions in.
@@ -21,47 +21,44 @@ final class SessionHandler implements \SessionHandlerInterface
         $this->dbConnection = $mysqli;
         $this->dbTable = $tableName;
         $this->m_maxAge = $maxAge;
-        
-        
-        $createSessionsTableQuery = 
-            "CREATE TABLE IF NOT EXISTS `" . $this->dbTable . "` (
+
+        $createSessionsTableQuery =
+            "CREATE TABLE IF NOT EXISTS `{$this->dbTable}` (
                 `id` varchar(32) NOT NULL,
                 `modified_timestamp` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 `data` mediumtext,
                 PRIMARY KEY (`id`),
                 KEY `modified_timestamp` (`modified_timestamp`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-        
+
         $this->dbConnection->query($createSessionsTableQuery);
     }
-    
-    
+
+
     public function open($savePath, $sessionName)
     {
-        $sql =
-            "DELETE FROM `" . $this->dbTable . "` " . 
-            "WHERE `modified_timestamp` < (NOW() - INTERVAL " . $this->m_maxAge . " SECOND)";
-        
+        $sql = "DELETE FROM `{$this->dbTable}` WHERE `modified_timestamp` < (NOW() - INTERVAL {$this->m_maxAge} SECOND)";
         return $this->dbConnection->query($sql);
     }
-    
-    
+
+
     public function close()
     {
         return $this->dbConnection->close();
     }
-    
-    
+
+
     public function read($id)
     {
-        $sql = 
-            "SELECT `data` " . 
-            "FROM `" . $this->dbTable . "` " . 
-            "WHERE `id` = '" . $id . "'";
-        
+        $sql = "SELECT `data` FROM `{$this->dbTable}` WHERE `id` = '{$id}'";
         $result = $this->dbConnection->query($sql);
-        
-        if ($result === FALSE)
+
+        if ($result === false)
+        {
+            throw new \Exception("There is an issue with your session handler using MySQL.");
+        }
+
+        if ($result->num_rows === 0)
         {
             $result = "";
         }
@@ -71,35 +68,29 @@ final class SessionHandler implements \SessionHandlerInterface
             $result = $row['data'];
             $result = $result === null ? "" : $result;
         }
-        
+
         return $result;
     }
-    
-    
+
+
     public function write($id, $data)
     {
-        $sql = "REPLACE INTO `" . $this->dbTable . "` (id, data)" . 
-               " VALUES('" . $id . "', '" . $data . "')";
-        
+        $sql = "REPLACE INTO `{$this->dbTable}` (id, data) VALUES('{$id}', '{$data}')";
         return $this->dbConnection->query($sql);
     }
-    
-    
+
+
     public function destroy($id)
     {
-        $sql = "DELETE FROM `" . $this->dbTable . " WHERE `id` = '" . $id . "'";
+        $sql = "DELETE FROM `{$this->dbTable}` WHERE `id` = '{$id}'";
         return $this->dbConnection->query($sql);
     }
-    
-    
+
+
     public function gc($maxlifetime)
     {
-        $sql = sprintf(
-            "DELETE FROM %s WHERE `timestamp` < '%s'", 
-            $this->dbTable, 
-            time() - intval($maxlifetime)
-        );
-        
+        $minTime = time() - intval($maxlifetime);
+        $sql = "DELETE FROM `{$this->dbTable}` WHERE `timestamp` < '{$minTime}'";
         return $this->dbConnection->query($sql);
     }
 }

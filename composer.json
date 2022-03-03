@@ -6,16 +6,16 @@
     "homepage": "https://github.com/programster/PHP-MySQL-Session-Handler",
     "license": "MIT",
     "authors": [
-    {
-        "name": "Jamie Cressey",
-        "email": "jamiecressey89@gmail.com",
-        "homepage": "https://github.com/jamiecressey"
-    },
-    {
-        "name": "Stuart Page (aka Programster)",
-        "email": "sdpagent@gmail.com",
-        "homepage": "https://github.com/programster"
-    }
+        {
+            "name": "Jamie Cressey",
+            "email": "jamiecressey89@gmail.com",
+            "homepage": "https://github.com/jamiecressey"
+        },
+        {
+            "name": "Stuart Page (aka Programster)",
+            "email": "sdpagent@gmail.com",
+            "homepage": "https://github.com/programster"
+        }
     ],
     "require": {
         "php": ">=7.0.0"
