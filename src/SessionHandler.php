@@ -90,7 +90,7 @@ final class SessionHandler implements \SessionHandlerInterface
 	public function gc(int $maxlifetime):int|false
 	{
 		$minTime = time() - intval($maxlifetime);
-		$sql = "DELETE FROM `{$this->dbTable}` WHERE `timestamp` < '{$minTime}'";
+		$sql = "DELETE FROM `{$this->dbTable}` WHERE `modified_timestamp` < '{$minTime}'";
 		return $this->dbConnection->query($sql);
 	}
 }
